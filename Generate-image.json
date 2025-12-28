@@ -1,0 +1,215 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "={{ $json.prompt }}",
+        "options": {
+          "returnImageUrls": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        608
+      ],
+      "id": "ab2f8129-38ce-465c-9ce2-db9ff19059c3",
+      "name": "Generate an image",
+      "credentials": {
+        "openAiApi": {
+          "id": "HeWF4yt6ckN8FeF4",
+          "name": "OpenAi account"
+        }
+      },
+      "notes": "This node generates an image from the given prompt using OpenAI. Credentials removed for public repo."
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "prompt"
+            },
+            {
+              "name": "email"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        608
+      ],
+      "id": "932e45af-9600-4f2c-815a-c3d792efda5f",
+      "name": "When Executed by Another Workflow",
+      "notes": "Trigger node that starts this workflow from another workflow. No sensitive data included."
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{$json.body}}\n\nImage generated: {{$json.image_url}}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        848,
+        608
+      ],
+      "id": "ff266ce1-c0b1-4f7d-8043-e08353a60c1a",
+      "name": "Send a message",
+      "webhookId": "2ef4e1ed-e62b-46b6-9c1a-898e673413b9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "RjJ4n7CrbJa30y2D",
+          "name": "Gmail account"
+        }
+      },
+      "notes": "Sends email with generated image. Credentials removed and real emails replaced with placeholders."
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Generate a professional email subject and body in JSON format. Use prompt and image_url from input. Output only JSON.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        320,
+        608
+      ],
+      "id": "a41f7999-545a-4f4c-8665-3adc3c41355f",
+      "name": "AI Agent",
+      "notes": "Processes the prompt and image URL to generate email content."
+    },
+    {
+      "parameters": {
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        848
+      ],
+      "id": "7d89ee77-7149-40f3-bfab-fa648f053532",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "HeWF4yt6ckN8FeF4",
+          "name": "OpenAi account"
+        }
+      },
+      "notes": "Calls OpenAI for text generation. Credentials removed for public repo."
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $json.output;\nlet parsed = {};\ntry { parsed = JSON.parse(raw); } catch (e) { throw new Error('Cannot parse AI JSON output'); }\nreturn [{ json: { subject: parsed.subject, body: parsed.body, email: $items('Merge')[0].json.email, image_url: $items('Merge')[0].json.image_url }}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        608
+      ],
+      "id": "7b8c1333-1237-40c1-bc44-73ed5fb4b12a",
+      "name": "Code in JavaScript",
+      "notes": "Parses the AI output and maps it to email fields. Safe for public repo."
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { prompt: $items('When Executed by Another Workflow')[0].json.prompt, email: 'user@example.com', image_url: 'IMAGE_URL_PLACEHOLDER' }}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        608
+      ],
+      "id": "1058a741-60be-447d-b564-64d9536d2148",
+      "name": "Merge",
+      "notes": "Merges workflow inputs with generated image URL. Placeholder values used."
+    }
+  ],
+  "connections": {
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cbadcc6aaca3997aea848bf34b5d4afb53932e75984009d3a80470cde77e06b5"
+  }
+}
