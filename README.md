@@ -13,28 +13,32 @@
   </ul>
 
   <h2>📂 Example Workflows</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Workflow</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><code>auto-email.json</code></td>
-        <td>Automatically sends emails based on triggers or schedules</td>
-      </tr>
-      <tr>
-        <td><code>api-notify.json</code></td>
-        <td>Sends notifications to APIs or messaging platforms</td>
-      </tr>
-      <tr>
-        <td><code>data-sync.json</code></td>
-        <td>Syncs data between applications automatically</td>
-      </tr>
-    </tbody>
-  </table>
+<table>
+  <thead>
+    <tr>
+      <th>Workflow</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Daily-events-reminder.json</code></td>
+      <td>Sends daily reminders about your calendar events using AI agents</td>
+    </tr>
+    <tr>
+      <td><code>Daily-mail-resume.json</code></td>
+      <td>Generates a daily summary of your emails for quick review</td>
+    </tr>
+    <tr>
+      <td><code>Detect-important-mails.json</code></td>
+      <td>Detects and flags important emails based on AI analysis</td>
+    </tr>
+    <tr>
+      <td><code>Generate-image.json</code></td>
+      <td>Generates images from prompts and optionally sends them by email with AI assistance</td>
+    </tr>
+  </tbody>
+</table>
 
   <h2>⚡ How to Use</h2>
   <ol>
